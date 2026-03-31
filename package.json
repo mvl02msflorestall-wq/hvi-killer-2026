@@ -1,29 +1,33 @@
-{
-  "name": "hvi-api",
-  "version": "1.0.0",
-  "description": "API Node.js para receber dados de inspeção HVI via QR Code",
-  "main": "api/index.js",
-  "type": "module",
-  "scripts": {
-    "dev": "node api/index.js",
-    "start": "node api/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "hvi",
-    "inspection",
-    "qrcode",
-    "api",
-    "vercel"
-  ],
-  "author": "HVI Team",
-  "license": "MIT",
-  "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "uuid": "^9.0.0"
-  },
-  "engines": {
-    "node": "24.x"
-  }
-}
+import express from 'express';
+import cors from 'cors';
+import { createClient } from '@supabase/supabase-js';
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// CONFIGURAÇÃO ALINHADA COM SUA TELA DA VERCEL
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY; // Nome exato do seu print
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'online', 
+    database: !!supabaseUrl && !!supabaseKey 
+  });
+});
+
+// Endpoint para receber a inspeção
+app.post('/api/inspection', async (req, res) => {
+  const { machine_id, operator_name, checklist, status } = req.body;
+  
+  const { data, error } = await supabase
+    .from('inspections')
+    .insert([{ machine_id, operator_name, checklist_json: checklist, status }]);
+
+  if (error) return res.status(500).json(error);
+  res.json({ message: 'Salvo no Supabase!', data });
+});
+
+export default app;
