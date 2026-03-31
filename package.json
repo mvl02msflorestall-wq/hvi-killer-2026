@@ -1,7 +1,7 @@
 {
   "name": "hvi-api",
   "version": "1.0.0",
-  "description": "API Node.js para receber dados de inspeÃ§Ã£o HVI via QR Code",
+  "description": "API Node.js para receber dados de inspeção HVI via QR Code",
   "main": "api/index.js",
   "type": "module",
   "scripts": {
@@ -24,6 +24,6 @@
     "uuid": "^9.0.0"
   },
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   }
 }
